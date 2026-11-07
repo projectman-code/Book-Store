@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Invoice {{ code }}</title>
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #141b34; margin: 0; background: #eef0f6; }
+  .sheet { max-width: 760px; margin: 24px auto; background: #fff; padding: 40px; border-radius: 14px; }
+  h1 { font-family: Georgia, serif; font-size: 28px; margin: 0; }
+  .top { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; border-bottom: 2px solid #141b34; padding-bottom: 18px; }
+  .muted { color: #5b6380; font-size: 14px; }
+  table { width: 100%; border-collapse: collapse; margin-top: 24px; }
+  th, td { text-align: left; padding: 10px 6px; border-bottom: 1px solid #e3e6ef; font-size: 14px; }
+  th.r, td.r { text-align: right; }
+  .totals { margin-left: auto; width: 260px; margin-top: 16px; font-size: 14px; }
+  .totals div { display: flex; justify-content: space-between; padding: 5px 0; }
+  .totals .grand { border-top: 2px solid #141b34; margin-top: 6px; padding-top: 10px; font-weight: 700; font-size: 17px; }
+  .cols { display: flex; gap: 40px; flex-wrap: wrap; margin-top: 22px; }
+  .btn { display: inline-block; margin: 0 auto 24px; padding: 12px 22px; background: #f5a524; color: #141b34; border: 0; border-radius: 10px; font-weight: 700; font-size: 15px; cursor: pointer; }
+  .bar { text-align: center; padding-top: 16px; }
+  @media print { body { background: #fff; } .sheet { margin: 0; padding: 0; } .bar { display: none; } }
+</style>
+</head>
+<body>
+<div class="bar"><button class="btn" onclick="window.print()">Print or save as PDF</button></div>
+<div class="sheet">
+  <div class="top">
+    <div><h1>Online Book Store</h1><div class="muted">Invoice (demo)</div></div>
+    <div style="text-align:right"><strong>{{ code }}</strong><div class="muted">Placed on {{ o.created_at[:10] }}</div></div>
+  </div>
+  <div class="cols">
+    <div><div class="muted">Deliver to</div><strong>{{ o.ship_name }}</strong><br>{{ o.ship_address }}<br>{{ o.ship_city }} - {{ o.ship_pincode }}<br>Phone: {{ o.ship_phone }}</div>
+    <div><div class="muted">Payment</div><strong>Cash on Delivery</strong><br>
+      {% if o.payment_status == 'paid' %}Paid (cash collected){% elif o.payment_status == 'pending' %}To be paid on delivery{% elif o.payment_status == 'refund_pending' %}Refund pending{% else %}Not applicable{% endif %}
+      <br><span class="muted">Order status: {{ o.status|capitalize }}</span></div>
+  </div>
+  <table>
+    <thead><tr><th>Book</th><th class="r">Price</th><th class="r">Qty</th><th class="r">Amount</th></tr></thead>
+    <tbody>
+    {% for i in items %}
+      <tr><td>{{ i.title }}<div class="muted">{{ i.author }}</div></td><td class="r">Rs {{ i.price }}</td><td class="r">{{ i.qty }}</td><td class="r">Rs {{ i.price * i.qty }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  <div class="totals">
+    <div><span>Subtotal</span><span>Rs {{ o.subtotal }}</span></div>
+    {% if o.discount %}<div><span>Coupon {{ o.coupon_code }}</span><span>- Rs {{ o.discount }}</span></div>{% endif %}
+    <div><span>Delivery</span><span>Free</span></div>
+    <div class="grand"><span>Total</span><span>Rs {{ o.total }}</span></div>
+  </div>
+  <p class="muted" style="margin-top:32px">Thank you for shopping with us. Books can be returned within 7 days of delivery.</p>
+</div>
+</body>
+</html>

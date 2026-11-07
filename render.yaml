@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: online-book-store
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 1 --threads 4
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.3
+      - key: SECRET_KEY
+        generateValue: true
+      - key: COOKIE_SECURE
+        value: "1"
+      # Demo accounts + sample books. Set to "0" for a clean store.
+      - key: SEED_DEMO
+        value: "1"
